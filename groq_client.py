@@ -1,29 +1,18 @@
 from openai import OpenAI
-from dotenv import load_dotenv
-import os
-
-
-# Carga el archivo .env desde la misma carpeta donde está este archivo.
-ruta_env = os.path.join(os.path.dirname(__file__), ".env")
-load_dotenv(ruta_env, override=True)
 
 
 class GroqClient:
     """
     Cliente para usar Groq como chatbot dentro de una agenda estudiantil.
 
-    Su función principal es responder preguntas sobre la agenda del usuario,
-    analizar pendientes y dar recomendaciones académicas.
+    La API key se recibe desde main.py, por medio de Streamlit.
     """
 
-    def __init__(self):
-        self.__api_key = os.getenv("GROQ_API_KEY")
-
-        if self.__api_key:
-            self.__api_key = self.__api_key.strip()
-
-        if not self.__api_key:
-            raise ValueError("La variable de entorno GROQ_API_KEY no está definida.")
+    def __init__(self, api_key: str):
+        if api_key:
+            self.__api_key = api_key.strip()
+        else:
+            raise ValueError("No se recibió una API key de Groq.")
 
         self.__cliente = OpenAI(
             base_url="https://api.groq.com/openai/v1",
@@ -62,11 +51,6 @@ class GroqClient:
     def __construir_contexto_agenda(self, agenda) -> str:
         """
         Convierte la agenda del usuario en texto para que la IA pueda leerla.
-
-        agenda puede ser:
-        - Una lista de pendientes.
-        - Un diccionario con usuarios, clases o actividades.
-        - Texto ya formateado.
         """
 
         if not agenda:
