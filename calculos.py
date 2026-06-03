@@ -1,33 +1,92 @@
 from datetime import datetime, date
 
 
+class TipoActividad:
+    """
+    Clase base para representar un tipo de actividad.
+    Esta clase permite aplicar herencia y polimorfismo.
+    """
+
+    def obtener_peso(self) -> int:
+        return 15
+
+    def obtener_factor_tiempo(self) -> float:
+        return 1.0
+
+
+class Lectura(TipoActividad):
+    """
+    Subclase para actividades de lectura.
+    """
+
+    def obtener_peso(self) -> int:
+        return 8
+
+    def obtener_factor_tiempo(self) -> float:
+        return 0.8
+
+
+class Tarea(TipoActividad):
+    """
+    Subclase para actividades tipo tarea.
+    """
+
+    def obtener_peso(self) -> int:
+        return 15
+
+    def obtener_factor_tiempo(self) -> float:
+        return 1.0
+
+
+class Practica(TipoActividad):
+    """
+    Subclase para actividades tipo práctica.
+    """
+
+    def obtener_peso(self) -> int:
+        return 18
+
+    def obtener_factor_tiempo(self) -> float:
+        return 1.2
+
+
+class Proyecto(TipoActividad):
+    """
+    Subclase para actividades tipo proyecto.
+    """
+
+    def obtener_peso(self) -> int:
+        return 25
+
+    def obtener_factor_tiempo(self) -> float:
+        return 1.4
+
+
+class Examen(TipoActividad):
+    """
+    Subclase para actividades tipo examen.
+    """
+
+    def obtener_peso(self) -> int:
+        return 30
+
+    def obtener_factor_tiempo(self) -> float:
+        return 1.6
+
+
 class CalculadoraAgenda:
     """
     Clase encargada de calcular automáticamente la prioridad de los pendientes
     según la fecha de entrega, tipo de actividad, tipo de materia y horas estimadas.
+
+    Esta clase usa objetos de tipo actividad para aplicar herencia y polimorfismo.
     """
 
     def __init__(self):
-        self.__peso_tipo_actividad = {
-            "Lectura": 8,
-            "Tarea": 15,
-            "Práctica": 18,
-            "Proyecto": 25,
-            "Examen": 30
-        }
-
         self.__peso_tipo_materia = {
             "Humanidades": 5,
             "Tronco común": 10,
             "Carrera": 15
-        }
-
-        self.__factor_tiempo_actividad = {
-            "Lectura": 0.8,
-            "Tarea": 1.0,
-            "Práctica": 1.2,
-            "Proyecto": 1.4,
-            "Examen": 1.6
         }
 
         self.__factor_tiempo_materia = {
@@ -35,6 +94,27 @@ class CalculadoraAgenda:
             "Tronco común": 1.15,
             "Carrera": 1.3
         }
+
+    def __crear_tipo_actividad(self, tipo_actividad: str) -> TipoActividad:
+        """
+        Crea un objeto según el tipo de actividad.
+        Aquí se aplica herencia porque cada tipo viene de TipoActividad.
+        También se aplica polimorfismo porque todos tienen los mismos métodos,
+        pero cada subclase responde diferente.
+        """
+
+        if tipo_actividad == "Lectura":
+            return Lectura()
+        elif tipo_actividad == "Tarea":
+            return Tarea()
+        elif tipo_actividad == "Práctica":
+            return Practica()
+        elif tipo_actividad == "Proyecto":
+            return Proyecto()
+        elif tipo_actividad == "Examen":
+            return Examen()
+        else:
+            return Tarea()
 
     def calcular_dias_restantes(self, fecha_entrega: str) -> int:
         """
@@ -87,7 +167,9 @@ class CalculadoraAgenda:
         tipo_actividad = pendiente.get("tipo_actividad", "Tarea")
         tipo_materia = pendiente.get("tipo_materia", "Tronco común")
 
-        factor_actividad = self.__factor_tiempo_actividad.get(tipo_actividad, 1.0)
+        actividad = self.__crear_tipo_actividad(tipo_actividad)
+
+        factor_actividad = actividad.obtener_factor_tiempo()
         factor_materia = self.__factor_tiempo_materia.get(tipo_materia, 1.15)
 
         tiempo_ajustado = horas_base * factor_actividad * factor_materia
@@ -121,8 +203,10 @@ class CalculadoraAgenda:
 
         dias_restantes = self.calcular_dias_restantes(fecha)
 
+        actividad = self.__crear_tipo_actividad(tipo_actividad)
+
         puntaje_urgencia = self.calcular_urgencia(dias_restantes)
-        puntaje_actividad = self.__peso_tipo_actividad.get(tipo_actividad, 15)
+        puntaje_actividad = actividad.obtener_peso()
         puntaje_materia = self.__peso_tipo_materia.get(tipo_materia, 10)
 
         # Se limita el efecto de las horas para que no domine todo el cálculo.
