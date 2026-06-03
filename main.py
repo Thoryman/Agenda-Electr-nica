@@ -1,20 +1,23 @@
+# Importamos las librerías necesarias y los módulos personalizados
+
+# Librería streamlit para la interfaz gráfica
 import streamlit as st
 
+# Módulos personalizados para que funcione la agenda
 from datajson import DataJson
 from calculos import CalculadoraAgenda
 from groq_client import GroqClient
 
 
+# Configuración de la página
 st.set_page_config(
-    page_title="Agenda Inteligente",
-    page_icon="📚",
+    page_title="Agenda Inteligente Pythónica",
+    page_icon="https://cdn-icons-png.flaticon.com/512/677/677388.png", # Logo de una agenda 
     layout="centered"
 )
 
-
-# -----------------------------
-# Estados iniciales
-# -----------------------------
+# Estados inciales del logging y la sesión
+# Se usan para evitar que streamlit borre los datos cada vez que se actualiza el sitio
 if "logueado" not in st.session_state:
     st.session_state.logueado = False
 
@@ -42,9 +45,7 @@ if "groq_client" not in st.session_state:
         st.session_state.error_groq = str(error)
 
 
-# -----------------------------
-# Funciones auxiliares
-# -----------------------------
+# Funciones auxiliares para manejar la agenda y los pendientes
 def obtener_pendientes_ordenados():
     """
     Analiza y ordena los pendientes.
@@ -117,18 +118,28 @@ def cerrar_sesion():
         st.session_state.groq_client.limpiar_historial()
 
 
-# -----------------------------
-# Título principal
-# -----------------------------
-st.title("📚 Agenda Inteligente")
-st.write("Organiza tus pendientes y recibe recomendaciones académicas con IA.")
+# Título y bienvenida del programa
+columna1, columna2 = st.columns([1, 3])
+with columna1:
+    st.image("https://covercero.com.mx/wp-content/uploads/2025/01/Zorros-Cetys-Logo.png", 
+             width=100)
+with columna2:
+    st.title("Agenda Inteligente CETYS")
+st.write("Esta agenda será tu amiga hasta en los peores momentos del parcial :)")
+st.sidebar.title("Autores del proyecto")
 
 
-# -----------------------------
-# Inicio de sesión simulado
-# -----------------------------
+# Información de los autores y agradecimientos
+st.sidebar.write("- Felián Estrada - 39105")
+st.sidebar.write("- Yamil Barajas - 39660")
+st.sidebar.write("- Angel Barraza - 39118")
+st.sidebar.write("- Profesor: Dario Landeros")
+st.sidebar.write(" Mucha gracias, profesor. Después de tanto código y lágrimas, se logró :D")
+
+
+# Simular inicio de sesión
 if not st.session_state.logueado:
-    st.subheader("Inicio de sesión simulado")
+    st.subheader("Inicio de sesión")
 
     nombre = st.text_input("Escribe tu nombre:")
 
@@ -138,7 +149,7 @@ if not st.session_state.logueado:
             st.session_state.logueado = True
             st.rerun()
         else:
-            st.warning("Debes escribir un nombre para continuar.")
+            st.warning("Debes escribir un nombre para continuar, camarada.")
 
     st.stop()
 
@@ -146,25 +157,21 @@ if not st.session_state.logueado:
 st.write(f"Bienvenido, **{st.session_state.usuario}**.")
 
 
-# -----------------------------
-# Crear o cargar agenda
-# -----------------------------
+# Apartado para cargar o crear la agenda
 if st.session_state.agenda is None:
-    st.subheader("¿Cómo quieres iniciar tu agenda?")
+    st.subheader("¿Cómo quieres iniciar tu agenda? 👀")
 
     opcion = st.radio(
         "Selecciona una opción:",
         [
             "Crear agenda desde cero",
-            "Cargar agenda desde archivo JSON"
+            "Cargar agenda desde archivo .JSON"
         ]
     )
 
     if opcion == "Crear agenda desde cero":
         if st.button("Crear agenda"):
-            st.session_state.agenda = st.session_state.data_json.crear_agenda_vacia(
-                st.session_state.usuario
-            )
+            st.session_state.agenda = st.session_state.data_json.crear_agenda_vacia(st.session_state.usuario)
             st.rerun()
 
     else:
@@ -174,9 +181,7 @@ if st.session_state.agenda is None:
         )
 
         if archivo_json is not None:
-            agenda_cargada, error = st.session_state.data_json.cargar_desde_archivo_subido(
-                archivo_json
-            )
+            agenda_cargada, error = st.session_state.data_json.cargar_desde_archivo_subido(archivo_json)
 
             if error:
                 st.error(error)
@@ -186,7 +191,7 @@ if st.session_state.agenda is None:
                 if not st.session_state.agenda.get("usuario"):
                     st.session_state.agenda["usuario"] = st.session_state.usuario
 
-                st.success("Agenda cargada correctamente.")
+                st.success("Agenda cargada correctamente :D.")
                 st.rerun()
 
     st.stop()
@@ -195,9 +200,7 @@ if st.session_state.agenda is None:
 agenda = st.session_state.agenda
 
 
-# -----------------------------
-# Secciones principales
-# -----------------------------
+# Secciones principales del programa, organizadas en tabs
 tab_registrar, tab_resumen, tab_chat, tab_config = st.tabs(
     [
         "📝 Registrar",
@@ -208,9 +211,7 @@ tab_registrar, tab_resumen, tab_chat, tab_config = st.tabs(
 )
 
 
-# -----------------------------
-# TAB 1: Registrar
-# -----------------------------
+# Tab 1: Registrar pendientes en la agenda
 with tab_registrar:
     st.subheader("Registrar pendiente")
 
@@ -262,9 +263,7 @@ with tab_registrar:
     st.info("La prioridad no la eliges tú directamente. El programa la calcula usando la fecha, tipo de actividad, tipo de materia y horas estimadas.")
 
 
-# -----------------------------
-# TAB 2: Resumen de agenda
-# -----------------------------
+# Tab 2: Resumen de agenda y pendientes ordenados por prioridad
 with tab_resumen:
     st.subheader("Resumen de agenda")
 
@@ -310,14 +309,18 @@ with tab_resumen:
                         st.rerun()
 
 
-# -----------------------------
-# TAB 3: Chatbox
-# -----------------------------
+# Tab 3: Chatbox con IA para recomendaciones impulsadas por Groq
 with tab_chat:
     st.subheader("Chatbox de agenda")
+    
+    columna1, columna2 = st.columns([0.4, 1])
+    with columna1:
+        st.write("Impulsado por:")
+    with columna2:
+        st.image("https://cdn.sanity.io/images/chol0sk5/production/ce0b2266373b3c9722b0bccb9a98441c26c89696-1200x630.png", width=100)
 
     if st.session_state.error_groq:
-        st.error("No se pudo conectar con Groq.")
+        st.error("No se pudo conectar con Groq ):")
         st.write(st.session_state.error_groq)
         st.info("Revisa que tu archivo .env tenga la variable GROQ_API_KEY.")
     else:
@@ -380,9 +383,7 @@ with tab_chat:
             st.rerun()
 
 
-# -----------------------------
-# TAB 4: Configuración
-# -----------------------------
+#Tab 4: Configuración, descarga de agenda y cierre de sesión
 with tab_config:
     st.subheader("Configuración")
 
