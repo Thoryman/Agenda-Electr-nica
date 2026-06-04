@@ -39,7 +39,7 @@ Profesor: Dario Landeros
 ## Instalación y ejecución del programa
 -   El archivo "requirements.txt" contiene las librerías externas de Python para
     poder hacer funcionar el proyecto desde una máquina local. Instalar con el comando "pip install -r requirements.txt" desde una terminal de consola, en la misma carpeta donde está descargado el proyecto.
--   Para ejecutar el programa en local, se necesita tener todos los módulos
+-   Para ejecutar el programa en local, se necesitan tener todos los módulos
     instalados en un mismo fichero y las librerías del proyecto.
 -   En una pestaña de consola ejecutar el comando "streamlit run main.py" para
     que el programa se ejecute localmente.
