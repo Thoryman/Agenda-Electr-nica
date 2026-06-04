@@ -1,6 +1,10 @@
+# calculos.py
+
+# Importamos datetime para calcular fechas y días restantes
 from datetime import datetime, date
 
 
+# Clase base para aplicar herencia y polimorfismo
 class TipoActividad:
     """
     Clase base para representar un tipo de actividad.
@@ -14,6 +18,7 @@ class TipoActividad:
         return 1.0
 
 
+# Subclase para actividades de lectura
 class Lectura(TipoActividad):
     """
     Subclase para actividades de lectura.
@@ -26,6 +31,7 @@ class Lectura(TipoActividad):
         return 0.8
 
 
+# Subclase para actividades tipo tarea
 class Tarea(TipoActividad):
     """
     Subclase para actividades tipo tarea.
@@ -38,6 +44,7 @@ class Tarea(TipoActividad):
         return 1.0
 
 
+# Subclase para actividades tipo práctica
 class Practica(TipoActividad):
     """
     Subclase para actividades tipo práctica.
@@ -50,6 +57,7 @@ class Practica(TipoActividad):
         return 1.2
 
 
+# Subclase para actividades tipo proyecto
 class Proyecto(TipoActividad):
     """
     Subclase para actividades tipo proyecto.
@@ -62,6 +70,7 @@ class Proyecto(TipoActividad):
         return 1.4
 
 
+# Subclase para actividades tipo examen
 class Examen(TipoActividad):
     """
     Subclase para actividades tipo examen.
@@ -74,6 +83,7 @@ class Examen(TipoActividad):
         return 1.6
 
 
+# Clase para calcular prioridad, urgencia y carga de trabajo
 class CalculadoraAgenda:
     """
     Clase encargada de calcular automáticamente la prioridad de los pendientes
@@ -209,7 +219,7 @@ class CalculadoraAgenda:
         puntaje_actividad = actividad.obtener_peso()
         puntaje_materia = self.__peso_tipo_materia.get(tipo_materia, 10)
 
-        # Se limita el efecto de las horas para que no domine todo el cálculo.
+        # Se limita el efecto de las horas para que no domine todo el cálculo
         puntaje_horas = min(horas_estimadas * 5, 30)
 
         puntaje_total = (
