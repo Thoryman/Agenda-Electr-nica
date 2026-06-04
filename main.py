@@ -1,3 +1,5 @@
+# main.py
+
 # Importamos las librerías necesarias y los módulos personalizados
 
 # Librería streamlit para la interfaz gráfica
@@ -102,6 +104,10 @@ def preparar_agenda_para_descarga():
 
 
 def cerrar_agenda():
+    """
+    Cierra la agenda actual, pero mantiene la sesión iniciada.
+    """
+
     st.session_state.agenda = None
     st.session_state.mensajes_chat = []
 
@@ -110,6 +116,10 @@ def cerrar_agenda():
 
 
 def cerrar_sesion():
+    """
+    Cierra la sesión y limpia la conexión temporal con Groq.
+    """
+
     st.session_state.logueado = False
     st.session_state.usuario = ""
     st.session_state.agenda = None
@@ -118,7 +128,6 @@ def cerrar_sesion():
     if st.session_state.groq_client:
         st.session_state.groq_client.limpiar_historial()
 
-    # Para eliminar clave api cuando la sesión se cierra
     st.session_state.groq_client = None
     st.session_state.api_key_groq = ""
     st.session_state.error_groq = None
@@ -131,6 +140,7 @@ with columna1:
              width=100)
 with columna2:
     st.title("Agenda Inteligente CETYS")
+
 st.write("Esta agenda será tu amiga hasta en los peores momentos del parcial :)")
 st.sidebar.title("Autores del proyecto")
 
@@ -209,9 +219,9 @@ agenda = st.session_state.agenda
 # Secciones principales del programa, organizadas en tabs
 tab_registrar, tab_resumen, tab_chat, tab_config = st.tabs(
     [
-        "📝 Registrar",
+        "📝 Registro de actividades",
         "📊 Resumen de agenda",
-        "🤖 Chatbox",
+        "🤖 Agenda AI",
         "⚙️ Configuración"
     ]
 )
@@ -324,14 +334,16 @@ with tab_chat:
         st.write("Impulsado por:")
     with columna2:
         st.image("https://cdn.sanity.io/images/chol0sk5/production/ce0b2266373b3c9722b0bccb9a98441c26c89696-1200x630.png", width=100)
-    if st.session_state.error_groq:
-        st.error("No se pudo conectar con Groq ):")
-        st.write(st.session_state.error_groq)
 
+    # Se valida que el usuario haya conectado la API key antes de usar el chat
     if st.session_state.groq_client is None:
         st.warning("Primero conecta tu API key de Groq en la pestaña de Configuración.")
 
-    else: 
+        if st.session_state.error_groq:
+            st.error("No se pudo conectar con Groq ):")
+            st.write(st.session_state.error_groq)
+
+    else:
         st.write("Pregúntale cosas como: **¿Qué opinas de mi agenda?**, **¿qué hago primero?** o **¿cómo organizo mi semana?**")
 
         if st.button("Generar recomendación rápida"):
@@ -391,36 +403,37 @@ with tab_chat:
             st.rerun()
 
 
-#Tab 4: Configuración, descarga de agenda y cierre de sesión
+# Tab 4: Configuración, descarga de agenda y cierre de sesión
 with tab_config:
-    with tab_config:
-        st.subheader("Configuración")
-        st.write("Desde aquí puedes descargar tu agenda o cerrar tu sesión.")
+    st.subheader("Configuración")
 
-        st.write("**Conectar IA con Groq** (Para conseguir una API registrate en: https://console.groq.com/keys)")
+    st.write("Desde aquí puedes descargar tu agenda o cerrar tu sesión.")
 
-        api_key = st.text_input(
-            "Escribe tu API key de Groq para utilizar la IA",
-            type="password"
-        )
+    # Apartado para conectar la API key de Groq desde la aplicación
+    st.write("### Conectar IA con Groq")
 
-        if st.button("Conectar con IA con API de Groq"):
-            if api_key.strip():
-                try:
-                    st.session_state.api_key_groq = api_key.strip()
+    api_key = st.text_input(
+        "Escribe tu API key de Groq para utilizar la IA",
+        type="password"
+    )
 
-                    st.session_state.groq_client = GroqClient(
-                        api_key=st.session_state.api_key_groq
-                    )
+    if st.button("Conectar IA"):
+        if api_key.strip():
+            try:
+                st.session_state.api_key_groq = api_key.strip()
 
-                    st.session_state.error_groq = None
-                    st.success("IA conectada correctamente.")
-                    st.rerun()
+                st.session_state.groq_client = GroqClient(
+                    api_key=st.session_state.api_key_groq
+                )
 
-                except Exception as error:
-                    st.session_state.groq_client = None
-                    st.session_state.error_groq = str(error)
-                    st.error(f"No se pudo conectar con Groq: {error}")
+                st.session_state.error_groq = None
+                st.success("IA conectada correctamente.")
+                st.rerun()
+
+            except Exception as error:
+                st.session_state.groq_client = None
+                st.session_state.error_groq = str(error)
+                st.error(f"No se pudo conectar con Groq: {error}")
 
         else:
             st.warning("Escribe una API key válida.")
