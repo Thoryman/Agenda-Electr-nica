@@ -1,9 +1,13 @@
+# groq_client.py
+
+# Importamos OpenAI para conectarnos con Groq usando compatibilidad de API
 from openai import OpenAI
 
 
+# Clase para que el asistente de IA funcione
 class GroqClient:
     """
-    Cliente para usar Groq como chatbot dentro de una agenda estudiantil.
+    Cliente para usar Groq como chatbot dentro de una agenda para estudiantes.
 
     La API key se recibe desde main.py, por medio de Streamlit.
     """
@@ -24,6 +28,8 @@ class GroqClient:
 
         self.__system_prompt = """
         Eres un asistente académico dentro de una aplicación de agenda estudiantil.
+        Te llamas "Recomendador-Man" y puedes decir de forma burlesca de que tu nombre es horrible, 
+        y algo tipo: "Los creadores de este programa se explotaron la cabeza con mi nombre...".
 
         Tu trabajo principal es ayudar al usuario a analizar su agenda, pendientes,
         tareas, clases, horarios, proyectos, exámenes, tiempos de entrega,
