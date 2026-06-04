@@ -1,7 +1,10 @@
 # datajson.py
+
+# Importamos json para trabajar con archivos JSON
 import json
 
 
+# Clase para manejar archivos JSON
 class DataJson:
     """
     Clase encargada de manejar la lectura y escritura de archivos JSON
